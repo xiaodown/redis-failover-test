@@ -1,4 +1,4 @@
-from time import sleep
+from time import sleep, time
 from redis.backoff import ExponentialBackoff
 from redis.retry import Retry
 from redis.client import Redis
@@ -8,7 +8,6 @@ from redis.exceptions import (
    TimeoutError
 )
 import sys
-import curses
 
 retry = Retry(ExponentialBackoff(), 3)
 
@@ -21,10 +20,13 @@ def redis_tester(redis_client):
             test_key = f'test_key{loopcount}'
             test_value = f'test_value{loopcount}'
             print(f"\nSetting {test_key} to {test_value}")
+            start_time = time()
             redis_client.set(test_key, test_value)
             print(f"Getting {test_key}: ", redis_client.get(test_key))
             print(f"Deleting {test_key}")
             redis_client.delete(test_key)
+            end_time = time()
+            print(f"Time taken: {end_time - start_time} seconds")
             sleep(0.2) 
             loopcount += 1
     except Exception as e:
